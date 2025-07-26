@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "@devlikeapro/n8n-nodes-waha.wahaTrigger",
+      "typeVersion": 202502,
+      "position": [
+        -352,
+        80
+      ],
+      "id": "753d91fe-aa68-4085-8dfd-1cb8c7c96480",
+      "name": "WAHA Trigger",
+      "webhookId": "a355f756-6ad4-4541-9a96-a158974b79e9"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.payload.media.url.replace('localhost','waha') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "wahaApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        144
+      ],
+      "id": "8d3e19c7-ef60-46f0-ab6d-5e10d9bc8faa",
+      "name": "HTTP Request",
+      "credentials": {
+        "wahaApi": {
+          "id": "4fzLDO5BaRGxMw0P",
+          "name": "WAHA account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "37192150-ec2b-4729-8609-656fe0b645c9",
+              "leftValue": "={{ $json.payload.hasMedia }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8e4a6ce8-d164-4f56-8cec-3e3d8230265e",
+              "leftValue": "={{ $json.payload.media.mimetype }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "befd825b-dcd7-4734-9629-76a91d5c5a67",
+              "leftValue": "={{ $json.payload.from }}",
+              "rightValue": "1531478485@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        144
+      ],
+      "id": "b360ca28-7c32-4216-ae38-aefc2ef07d3c",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.payload.body }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1VB7W-47lnXAY8nMFFzcljG",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        640,
+        144
+      ],
+      "id": "dfb1ab50-f644-46bd-a635-be48b8aa6dad",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "r8D84tUnQ861QoZu",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WAHA Trigger": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f1eb3a16e6120c5eca7c83c5c11fe87213cbf992f5d36e1df02ba62a82c9376d"
+  }
+}
